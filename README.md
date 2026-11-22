@@ -1,104 +1,108 @@
-# Tournoi Asynconf 2023
+# Green Bank
 
-<p align="center">
-	<img src="https://github.com/maxencebonamy/maxencebonamy/blob/main/assets/Asynconf_2023.png" width="100%" alt="Sand Box">
-</p>
+A loan rate calculator for buying a vehicle, based on its environmental impact.
 
-<br>
+The user describes a vehicle (type, energy, yearly distance, year of manufacture, number of passengers) and gets a loan rate. The cleaner the vehicle, the lower the rate. The project was built for the Asynconf 2023 tournament and is deployed at [green-bank.maxencebonamy.fr](https://green-bank.maxencebonamy.fr).
 
-## Description
+## Table of contents
 
-Voici mon projet pour cette édition du tournoi de l'Asynconf. Je l'ai réalisé sous forme de site web, disponible à l'adresse <a href="https://asynconf.maxencebonamy.fr" target="_blank">asynconf.maxencebonamy.fr</a>.
-<br>
-Vous retrouverez ci-dessous les instructions pour exécuter le code, ainsi qu'une description brève du travail que j'ai réalisé conformément aux attentes du jury. Ensuite, vous retrouverez les technologies que j'ai utilisées pour réaliser le projet ainsi que l'arborescence du projet.
+- [Green Bank](#green-bank)
+	- [Table of contents](#table-of-contents)
+	- [How it works](#how-it-works)
+	- [Tech stack](#tech-stack)
+	- [Repository structure](#repository-structure)
+	- [Prerequisites](#prerequisites)
+	- [Installation](#installation)
+	- [Running locally](#running-locally)
+	- [Useful scripts](#useful-scripts)
+	- [Tests and quality](#tests-and-quality)
+	- [Deployment](#deployment)
+	- [License](#license)
 
-> [!IMPORTANT]
-> Le projet se lance sur Replit mais n'est vraiment pas stable du tout, donc si vous voulez l'essayer, je vous conseille très fortement de vous rendre plutôt ici : <a href="https://asynconf.maxencebonamy.fr" target="_blank">asynconf.maxencebonamy.fr</a> !
+## How it works
 
-<br>
+1. **Inputs**: the page is split into sections. The user picks a vehicle type, an energy and a number of passengers on cards, and sets the yearly distance and the year of manufacture with sliders. Sliders start at the middle value of their data file.
+2. **Score**: each of the vehicle type, energy, distance and year options carries an ecological mark out of 10. The score is the sum of the four marks, rounded to the nearest integer (a decimal part of exactly 0.5 rounds down).
+3. **Rate**: the rounded score is matched against the score ranges of `loan_rates.json` to get a base rate. The passenger option then adds or subtracts its `extra` value.
+4. **Result**: the final rate is computed again every time an input changes, and is displayed once all inputs are set. The page can be reset.
+5. **Data-driven options**: options, marks and rate ranges are read from JSON files in `src/assets/data`. Editing a file changes the site without touching the components.
 
-## Lancement du code
+The site is responsive and has a dark and a light theme, dark by default.
 
-### Lancer le code avec Replit
+## Tech stack
 
-1. **Se rendre** sur le <a href="https://replit.com/@MaxenceBonamy/AGB" target="_blank">dépôt Replit</a>.
+| Layer | Technologies |
+| --- | --- |
+| Frontend | Next.js 14 (App Router), React 18, Tailwind CSS 3, Radix UI, shadcn/ui, `class-variance-authority`, `next-themes`, Lucide, `react-parallax-tilt` |
+| Language | TypeScript 5 |
+| Data | Static JSON files |
+| Tooling | npm, Jest, ts-jest, ESLint (`@bluzzi/eslint-config`) |
+| Deployment | Replit, Vercel |
 
-2. **Cliquer** sur le bouton `Run`, ceci installera les dépendances et exécutera le code.
+## Repository structure
 
-### Lancer le code sur une autre machine
-
-> [!NOTE]
-> *Prerequis:*
-> - [x] *Git doit être installé. Si ce n'est pas le cas, <a href="https://git-scm.com/downloads" target="_blank">se rendre ici</a>.*
-> - [x] *NodeJS doit être installé. Si ce n'est pas le cas, <a href="https://nodejs.org/" target="_blank">se rendre ici</a>.*
-<br>
-
-1. **Cloner** ce dépôt GitHub à l'aide de la commande suivante :
 ```
-git clone https://github.com/maxencebonamy/AGB
+.
+├── src/
+│   ├── app/             Next.js entry: layout, main page, global styles
+│   ├── assets/
+│   │   ├── data/        JSON data files (vehicles, energies, distances, years, passengers, loan rates)
+│   │   └── images/      Images and icons
+│   ├── components/
+│   │   ├── navbar/      Navigation bar and theme toggle
+│   │   ├── sections/    One folder per page section (home, car, energy, distance, year, passengers, result)
+│   │   └── ui/          shadcn/ui components
+│   └── lib/             Rate algorithm, types, helpers
+└── tests/               Jest tests, same tree as src
 ```
 
-2. **Naviguer** à l'intérieur du dossier en tapant cette commande :
-```
-cd AGB
+Types in `src/lib/types.ts` are inferred from the JSON files. The `@/*` alias points to `src/*`. Components in `src/components/ui` are excluded from linting. Each data file is documented in [`src/assets/data/README.md`](src/assets/data/README.md), which lists the constraints to respect when editing them (unique ids, contiguous ranges).
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) 18 (the version declared in `replit.nix`)
+- npm
+
+## Installation
+
+```bash
+git clone git@github.com:maxencebonamy/Green-Bank.git
+cd Green-Bank
+npm install
 ```
 
-3. **Installer** les dépendances NodeJS à l'aide de la commande suivante :
-```
-npm i
-```
+## Running locally
 
-4. **Exécuter** le code en tapant cette commande :
-```
+```bash
 npm run dev
 ```
 
-<br>
+The application is available at <http://localhost:3000>. No environment variable is needed.
 
-## Travail réalisé
+## Useful scripts
 
-- Le site est entièrement "responsive", c'est-à-dire qu'il est adapté pour les tailles d'écran les plus communes (notament ordinateur, tablette et smartphone).
-- Il est possible de choisir entre le thème sombre et le thème clair, et ce à l'aide du "toggle" placé à droite de la barre de navigation.
-- Des tests unitaires ont été mis en place pour tester l'algorithme principal, ainsi que d'autres fonctionnalités. Pour les lancer, il suffit de taper la commmande :
-```
+| Command | Effect |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Lint the repository |
+| `npm run lint:fix` | Lint and auto-fix |
+| `npx jest` | Run the tests |
+
+## Tests and quality
+
+```bash
 npx jest
+npm run lint
 ```
-- J'ai choisi d'utiliser des fichiers au format `json` pour stocker les données liées au fonctionnement de l'algorithme. Ils sont placés dans le dossier `src/assets/data`.
-- La modification d'un de ces fichiers entraînera automatiquement des modifications sur le site de manière à ajouter, modifier ou supprimer des options très facilement.
-- Le code est commenté de manière à expliquer les instructions ou fonctions qui ne sont pas explicites.
 
-- *Je n'ai malheureusement pas eu le temps de réaliser des tests de scénarios pour les composants avec React Testing Library.*
+Tests use Jest with ts-jest and live in `tests/`. They cover the rate algorithm (including the cases given in the tournament statement) and the formatting helpers. Components are not tested.
 
-<br>
+## Deployment
 
-## Technologies utilisées
+The repository has no CI. [`.replit`](.replit) defines a Replit deployment (Cloud Run target) that runs `npm run build`, then `npm run start`. The production site is hosted on Vercel.
 
-Pour réaliser ce projet, j'ai fait le choix d'utiliser les technologies suivantes :
+## License
 
-- [x] **<a href="https://nextjs.org" target="_blank">NextJS</a>** : Un des framework React les plus répandus. Bien que je n'utilise pas la plupart de ses fonctionnalités dans ce projet, il reste un choix tout à fait cohérent.
-- [x] **<a href="https://typescriptlang.org" target="_blank">Typescript</a>** : Le langage que j'ai choisi d'utiliser pour avoir un code type-safe et ainsi plus maintenable.
-- [x] **<a href="https://react.dev" target="_blank">React</a>** : La librairie JavaScript que j'utilise le plus, c'est donc un choix assez logique pour moi de l'utiliser dans ce projet.
-- [x] **<a href="https://tailwindcss.com" target="_blank">TailwindCSS</a>** : La librairie CSS que j'utilise dans la plupart de mes projets pour gagner en efficacité.
-- [x] **<a href="https://ui.shadcn.com" target="_blank">Shadcn/UI</a>** : Une librairie React & Tailwind qui fournit des composants d'UI. J'ai ensuite apporté quelques modifications sur certains.
-- [x] **<a href="https://eslint.org" target="_blank">ESLint</a>** : Le linter TypeScript que j'ai utilisé pour écrire du code propre et maintenable (je l'utilise également comme formatter).
-- [x] **<a href="https://jestjs.io/" target="_blank">Jest</a>** : Une librairie JavaScript pour réaliser des tests unitaires.
-
-<br>
-
-- [x] J'ai également utilisé le logiciel **<a href="https://figma.com" target="_blank">Figma</a>** pour réaliser une maquette du site avant de le coder.
-- [x] De plus, j'ai utilisé le site **<a href="https://flaticon.com" target="_blank">Flaticon</a>** pour trouver les icônes présentes sur le site.
-- [x] Ensuite, j'ai utilisé quelques autres librairies utilitaires telles que **<a href="https://lucide.dev" target="_blank">Lucide</a>** pour quelques icônes supplémentaires ainsi que **<a href="https://www.npmjs.com/package/react-parallax-tilt" target="_blank">ReactParallaxTilt</a>** pour réaliser un effet "Tilt" sur certaines cartes.
-- [x] Finalement, Pour héberger le site, j'ai utilisé **<a href="https://vercel.com/" target="_blank">Vercel</a>**.
-
-<br>
-
-
-## Arborescence du projet
-
-Tout le code source se situe dans le dossier `src`.
-- Sous-dossier `app` : Point de départ de l'application, le fichier `layout.tsx` englobe le fichier `page.tsx` (fonctionnement du routing de NextJS).
-- Sous-dossier `assets` : Images, icônes et fichier de données au format `json`. Un fichier `README.md` est placé dans le dossier des données pour plus d'explications.
-- Sous-dossier `components` : Tous les composants React utilisées dans l'application, ceux présents dans le sous-dossier `ui` viennent de la librairie Shadcn/UI, ce sont donc les seuls que je n'ai pas écrits.
-- Sous-dossier `lib` : Les fichiers sources, qui correspondent à l'algorithme, aux fonctions utilitaires et les types.
-
-Tous les tests se situent dans le dossier `tests`. La même arborescence que le dossier `src` est gardée.
+No `LICENSE` file is present in the repository, so no license is declared.
