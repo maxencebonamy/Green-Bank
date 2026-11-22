@@ -2,7 +2,7 @@
 
 A loan rate calculator for buying a vehicle, based on its environmental impact.
 
-The user describes a vehicle (type, energy, yearly distance, year of manufacture, number of passengers) and gets a loan rate. The cleaner the vehicle, the lower the rate. The project was built for the Asynconf 2023 tournament and is deployed at [green-bank.maxencebonamy.fr](https://green-bank.maxencebonamy.fr).
+The user describes a vehicle (type, energy, yearly distance, year of manufacture, number of passengers) and gets a loan rate. The cleaner the vehicle, the lower the rate. The project was built for the Asynconf 2023 tournament, where it won first place, and is deployed at [green-bank.maxencebonamy.fr](https://green-bank.maxencebonamy.fr).
 
 ## Table of contents
 
@@ -105,4 +105,4 @@ The repository has no CI. [`.replit`](.replit) defines a Replit deployment (Clou
 
 ## License
 
-No `LICENSE` file is present in the repository, so no license is declared.
+This project is licensed under the [MIT License](LICENSE).
